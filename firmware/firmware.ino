@@ -15,7 +15,7 @@ const int daylightOffset_sec = 0;
 // --- Componentes ---
 Servo meuServo;
 ESP8266WebServer server(80);
-int pinoServo = 2; 
+int pinoServo = 4; // D4 / GPIO2 — conforme README e hardware
 
 // --- Variáveis de Controle ---
 String horarios[3] = {"07:00", "13:00", "19:00"};

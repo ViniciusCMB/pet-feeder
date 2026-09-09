@@ -1,112 +1,71 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Tratador</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0px;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-    </style>
-  </head>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tratador Automático</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+:root{--bg:#0b0c15;--card:#12132d;--accent:#7ee787;--text:#e6e8f0;--sub:#9aa0b5;}
+*{box-sizing:border-box;font-family:'Inter',sans-serif;}
+body{margin:0;background:radial-gradient(1200px 600px at 20% -10%,#1a1f4a,#0b0c15);min-height:100vh;color:var(--text);display:flex;align-items:center;justify-content:center;padding:2rem;}
+.card{background:rgba(18,19,45,0.85);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.05);border-radius:24px;padding:2.5rem;max-width:480px;width:100%;box-shadow:0 25px 60px rgba(0,0,0,0.6);}
+h1{margin:0 0 .25rem;font-size:1.8rem;background:linear-gradient(90deg,#fff,#7ee787);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.subtitle{color:var(--sub);margin-bottom:2rem;font-size:.95rem;}
+label{display:block;margin:1rem 0 .35rem;font-weight:600;font-size:.85rem;color:var(--sub);}
+input{width:100%;padding:.75rem 1rem;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--text);font-size:1rem;transition:border-color .2s;}
+input:focus{outline:none;border-color:var(--accent);}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;}
+.btn{margin-top:1.5rem;width:100%;padding:.9rem;border-radius:12px;border:none;background:linear-gradient(90deg,#7ee787,#4ecdc4);color:#0b0c15;font-weight:800;font-size:1rem;cursor:pointer;transition:transform .1s,opacity .2s;}
+.btn:hover{opacity:.92;transform:translateY(-2px);}
+.status{margin-top:1rem;text-align:center;color:var(--accent);font-weight:600;min-height:1.5rem;}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Tratador Automático</h1>
+  <p class="subtitle">Controle de alimentação do pet — rede local</p>
 
-  <body>
-    <h1>Tratador automático</h1>
-    <div style="display: flex; flex-direction: column; align-items: center">
-      <h2>Horários:</h2>
-      <p>Quais horários o tratador automático será ativado ao longo do dia.</p>
-      <h3>Manhã:</h3>
-      <input type="time" id="morning" name="morning" value="07:00" />
-      <h3>Tarde:</h3>
-      <input type="time" id="afternoon" name="afternoon" value="13:00" />
-      <h3>Noite:</h3>
-      <input type="time" id="evening" name="evening" value="19:00" />
-    </div>
+  <label>Manhã</label>
+  <input type="time" id="morning" value="07:00">
 
-    <div style="display: flex; flex-direction: column; align-items: center">
-      <h2>Quantidade:</h2>
-      <p>
-        Quanto de ração será oferecida, é baseado no tempo de acionamento (mais
-        tempo = mais ração)
-      </p>
-      <h3>Tempo ativo (s):</h3>
-      <input
-        type="number"
-        id="activeTime"
-        name="activeTime"
-        value="1"
-        min="0.1"
-        max="60"
-      />
-    </div>
-    <div
-      style="
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-        padding: 10px;
-      "
-    >
-      <button style="margin: 5px" id="test">Testar</button>
-      <button style="margin: 5px" id="save">Salvar</button>
-    </div>
-    <script>
-      // Função para carregar as configurações atuais do ESP8266 quando a página abre
-      window.addEventListener("load", function () {
-        fetch("/settings")
-          .then((response) => response.json())
-          .then((data) => {
-            document.getElementById("morning").value = data.morning;
-            document.getElementById("afternoon").value = data.afternoon;
-            document.getElementById("evening").value = data.evening;
-            document.getElementById("activeTime").value = data.activeTime;
-          });
-      });
+  <label>Tarde</label>
+  <input type="time" id="afternoon" value="13:00">
 
-      // Evento para o botão de TESTE
-      document.getElementById("test").addEventListener("click", function () {
-        const activeTime = document.getElementById("activeTime").value;
+  <label>Noite</label>
+  <input type="time" id="evening" value="19:00">
 
-        // Envia o comando de teste para o ESP8266 via POST
-        fetch("/test", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: `activeTime=${activeTime}`,
-        })
-          .then((response) => response.text())
-          .then((data) => {
-            console.log(data);
-            alert(`Motor ativado por ${activeTime} segundos!`);
-          });
-      });
+  <label style="margin-top:1.5rem">Tempo ativo (s)</label>
+  <input type="number" id="activeTime" value="1" min="0.1" max="60" step="0.1">
 
-      // Evento para o botão de SALVAR
-      document.getElementById("save").addEventListener("click", function () {
-        const morning = document.getElementById("morning").value;
-        const afternoon = document.getElementById("afternoon").value;
-        const evening = document.getElementById("evening").value;
-        const activeTime = document.getElementById("activeTime").value;
+  <button class="btn" onclick="salvar()">Salvar Configurações</button>
+  <button class="btn" onclick="testar()" style="margin-top:.5rem;background:linear-gradient(90deg,#4ecdc4,#45b7d1);">Testar Motor</button>
 
-        const formData = `morning=${morning}&afternoon=${afternoon}&evening=${evening}&activeTime=${activeTime}`;
-
-        // Envia os novos dados para o ESP8266 salvar via POST
-        fetch("/save", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: formData,
-        })
-          .then((response) => response.text())
-          .then((data) => {
-            console.log(data);
-            alert("Configurações salvas com sucesso!");
-          });
-      });
-    </script>
-  </body>
+  <div class="status" id="status"></div>
+</div>
+<script>
+async function carregar(){
+  const r=await fetch('/settings');
+  const d=await r.json();
+  document.getElementById('morning').value=d.morning;
+  document.getElementById('afternoon').value=d.afternoon;
+  document.getElementById('evening').value=d.evening;
+  document.getElementById('activeTime').value=d.activeTime;
+}
+async function salvar(){
+  const f={morning:document.getElementById('morning').value,
+    afternoon:document.getElementById('afternoon').value,
+    evening:document.getElementById('evening').value,
+    activeTime:document.getElementById('activeTime').value};
+  const r=await fetch('/save',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(f)});
+  document.getElementById('status').textContent=await r.text();
+}
+async function testar(){
+  const t=document.getElementById('activeTime').value;
+  const r=await fetch('/test',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:`activeTime=${t}`});
+  document.getElementById('status').textContent=await r.text();
+}
+carregar();
+</script>
+</body>
 </html>
